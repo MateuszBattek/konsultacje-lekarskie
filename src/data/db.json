@@ -1,0 +1,725 @@
+{
+    "appointments": [
+        {
+            "id": "seed-2026-01-27T08:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-27T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-27T09:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-27T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-27T10:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-27T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-27T11:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-27T11:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-27T12:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-01-27T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-27T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-27T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-27T15:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-27T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-28T08:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-01-28T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-28T08:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-28T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-28T09:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-28T09:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-28T10:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-28T10:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-28T10:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-28T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-28T11:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-28T11:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-28T12:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-28T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-28T14:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-01-28T14:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-28T15:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-28T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-29T08:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-29T08:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-29T10:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-29T10:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "PRESCRIPTION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-29T10:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-29T11:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-29T11:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-29T11:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T11:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-29T12:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-29T12:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-29T12:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-29T13:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T13:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-29T13:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-29T13:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "PRESCRIPTION"
+        },
+        {
+            "id": "seed-2026-01-29T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-29T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-30T08:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-30T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-30T09:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-30T09:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-30T09:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-30T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-30T11:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-30T11:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-01-30T13:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-30T13:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-01-30T14:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-01-30T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-01-30T15:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-01-30T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-02T08:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-02T08:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-02T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-02T09:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-02T10:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-02-02T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-02T11:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T11:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-02T12:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T12:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-02T12:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-02T13:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T13:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-02T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-02T14:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T14:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-02T15:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-02T15:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-02T15:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-02-02T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-03T08:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-02-03T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-03T08:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-02-03T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-03T09:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-03T09:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-03T09:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-03T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-03T10:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-03T10:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-03T10:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-03T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-03T12:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-03T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-03T15:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-03T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "PRESCRIPTION"
+        },
+        {
+            "id": "seed-2026-02-04T08:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-04T08:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-04T08:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-04T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-04T09:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-04T10:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-04T10:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-04T11:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T11:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "PRESCRIPTION"
+        },
+        {
+            "id": "seed-2026-02-04T12:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-04T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-04T13:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T13:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-04T13:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T13:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-04T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-04T14:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-04T14:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-04T15:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p1",
+            "patientName": "Michał Brązowy",
+            "startTime": "2026-02-04T15:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "PRESCRIPTION",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-04T15:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-04T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-05T12:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-05T12:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "PRESCRIPTION"
+        },
+        {
+            "id": "seed-2026-02-05T12:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-05T12:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-05T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-05T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-05T15:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-05T15:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-05T15:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-05T15:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-06T08:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-06T08:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-06T09:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-06T09:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-06T09:30:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-06T09:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "FOLLOW_UP",
+            "notes": "Oczekiwana wizyta"
+        },
+        {
+            "id": "seed-2026-02-06T12:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-06T12:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-06T13:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-06T13:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "COMPLETED",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-06T13:30:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-06T13:30:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "CONSULTATION"
+        },
+        {
+            "id": "seed-2026-02-06T14:00:00+01:00",
+            "doctorId": "d1",
+            "startTime": "2026-02-06T14:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "AVAILABLE",
+            "type": "FOLLOW_UP"
+        },
+        {
+            "id": "seed-2026-02-06T15:00:00+01:00",
+            "doctorId": "d1",
+            "patientId": "p2",
+            "patientName": "Emilia Dawidowicz",
+            "startTime": "2026-02-06T15:00:00+01:00",
+            "durationMinutes": 30,
+            "status": "BOOKED",
+            "type": "CONSULTATION",
+            "notes": "Oczekiwana wizyta"
+        }
+    ],
+    "absences": []
+}

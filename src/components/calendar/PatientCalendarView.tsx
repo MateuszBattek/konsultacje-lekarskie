@@ -8,6 +8,7 @@ import { AppointmentDetailModal } from "./AppointmentDetailModal";
 import { CartPanel, calculatePrice } from "../cart/CartPanel";
 import { PaymentModal } from "../cart/PaymentModal";
 import type { Appointment, BookingFormData, Absence, CartItem } from "../../types";
+import { consultationService } from "../../services/consultationServices";
 
 interface PatientCalendarViewProps {
     appointments: Appointment[];
@@ -44,35 +45,44 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
         }
     };
 
-    const handleBooking = (bookingData: BookingFormData) => {
+    const handleBooking = async (bookingData: BookingFormData) => {
         if (!selectedSlot) return;
 
         const requiredSlots = bookingData.durationMinutes / 30;
         const slotStart = new Date(selectedSlot.startTime);
 
-        const updatedAppointments = appointments.map(apt => {
+        const updates: { id: string, data: Partial<Appointment> }[] = [];
+
+        appointments.forEach(apt => {
             const aptTime = new Date(apt.startTime);
 
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
                 if (aptTime.getTime() === checkTime.getTime() && apt.status === 'AVAILABLE') {
-                    return {
-                        ...apt,
-                        status: 'PENDING_PAYMENT' as const,
-                        patientId: currentPatientId,
-                        patientName: bookingData.patientName,
-                        type: bookingData.consultationType,
-                        durationMinutes: i === 0 ? bookingData.durationMinutes : 30,
-                        notes: i === 0 ? bookingData.notes : `Część konsultacji (${bookingData.patientName})`,
-                        isSubSlot: i > 0
-                    };
+                    updates.push({
+                        id: apt.id,
+                        data: {
+                            status: 'PENDING_PAYMENT',
+                            patientId: currentPatientId,
+                            patientName: bookingData.patientName,
+                            type: bookingData.consultationType,
+                            durationMinutes: i === 0 ? bookingData.durationMinutes : 30,
+                            notes: i === 0 ? bookingData.notes : `Część konsultacji (${bookingData.patientName})`,
+                            isSubSlot: i > 0
+                        }
+                    });
                 }
             }
-            return apt;
         });
 
-        setAppointments(updatedAppointments);
-        setIsCartOpen(true);
+        try {
+            await consultationService.bulkUpdateAppointments(updates);
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+            setIsCartOpen(true);
+        } catch (error) {
+            console.error("Failed to book slots:", error);
+        }
     };
 
     const cartItems = useMemo<CartItem[]>(() => {
@@ -84,7 +94,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             }));
     }, [appointments, currentPatientId]);
 
-    const handleRemoveFromCart = (appointmentId: string) => {
+    const handleRemoveFromCart = async (appointmentId: string) => {
         const appointmentToRemove = appointments.find(a => a.id === appointmentId);
         if (!appointmentToRemove) return;
 
@@ -92,39 +102,56 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
         const duration = appointmentToRemove.durationMinutes;
         const requiredSlots = duration / 30;
 
-        const updatedAppointments = appointments.map(apt => {
+        const updates: { id: string, data: Partial<Appointment> }[] = [];
+
+        appointments.forEach(apt => {
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
                 if (aptTime.getTime() === checkTime.getTime() && apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId) {
-                    return {
-                        ...apt,
-                        status: 'AVAILABLE' as const,
-                        patientId: undefined,
-                        patientName: undefined,
-                        notes: undefined,
-                        isSubSlot: undefined
-                    };
+                    updates.push({
+                        id: apt.id,
+                        data: {
+                            status: 'AVAILABLE',
+                            patientId: undefined,
+                            patientName: undefined,
+                            notes: undefined,
+                            isSubSlot: undefined
+                        }
+                    });
                 }
             }
-            return apt;
         });
-        setAppointments(updatedAppointments);
+
+        try {
+            await consultationService.bulkUpdateAppointments(updates);
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+        } catch (error) {
+            console.error("Failed to remove from cart:", error);
+        }
     };
 
-    const handlePaymentComplete = () => {
-        const updatedAppointments = appointments.map(apt => {
-            if (apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId) {
-                return { ...apt, status: 'BOOKED' as const };
-            }
-            return apt;
-        });
-        setAppointments(updatedAppointments);
-        setIsPaymentModalOpen(false);
-        setIsCartOpen(false);
+    const handlePaymentComplete = async () => {
+        const updates = appointments
+            .filter(apt => apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId)
+            .map(apt => ({
+                id: apt.id,
+                data: { status: 'BOOKED' as const }
+            }));
+
+        try {
+            await consultationService.bulkUpdateAppointments(updates);
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+            setIsPaymentModalOpen(false);
+            setIsCartOpen(false);
+        } catch (error) {
+            console.error("Failed to complete payment:", error);
+        }
     };
 
-    const handleCancelAppointment = (appointmentId: string) => {
+    const handleCancelAppointment = async (appointmentId: string) => {
         const appointmentToCancel = appointments.find(a => a.id === appointmentId);
         if (!appointmentToCancel) return;
 
@@ -132,25 +159,35 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
         const duration = appointmentToCancel.durationMinutes;
         const requiredSlots = duration / 30;
 
-        const updatedAppointments = appointments.map(apt => {
+        const updates: { id: string, data: Partial<Appointment> }[] = [];
+
+        appointments.forEach(apt => {
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
                 if (aptTime.getTime() === checkTime.getTime() && (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === currentPatientId) {
-                    return {
-                        ...apt,
-                        status: 'AVAILABLE' as const,
-                        patientId: undefined,
-                        patientName: undefined,
-                        notes: undefined,
-                        isSubSlot: undefined
-                    };
+                    updates.push({
+                        id: apt.id,
+                        data: {
+                            status: 'AVAILABLE',
+                            patientId: undefined,
+                            patientName: undefined,
+                            notes: undefined,
+                            isSubSlot: undefined
+                        }
+                    });
                 }
             }
-            return apt;
         });
-        setAppointments(updatedAppointments);
-        console.log(`❌ Appointment ${appointmentId} cancelled by patient.`);
+
+        try {
+            await consultationService.bulkUpdateAppointments(updates);
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+            console.log(`❌ Appointment ${appointmentId} cancelled by patient.`);
+        } catch (error) {
+            console.error("Failed to cancel appointment:", error);
+        }
     };
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);

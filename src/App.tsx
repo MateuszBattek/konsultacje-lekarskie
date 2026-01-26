@@ -13,11 +13,18 @@ function App() {
 
   // Initial Load
   useEffect(() => {
-    const loadedAppointments = consultationService.getAllAppointments();
-    const loadedAbsences = consultationService.getAllAbsences();
+    const fetchData = async () => {
+      try {
+        const loadedAppointments = await consultationService.getAllAppointments();
+        const loadedAbsences = await consultationService.getAllAbsences();
+        setAppointments(loadedAppointments);
+        setAbsences(loadedAbsences);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+      }
+    };
 
-    setAppointments(loadedAppointments);
-    setAbsences(loadedAbsences);
+    fetchData();
 
     // Persist Patient ID so it doesn't change on refresh
     let patientId = localStorage.getItem('current_patient_id');
@@ -27,18 +34,6 @@ function App() {
     }
     setCurrentPatientId(patientId);
   }, []);
-
-  // Sync Appointments
-  useEffect(() => {
-    if (appointments.length > 0) {
-      consultationService.saveAppointments(appointments);
-    }
-  }, [appointments]);
-
-  // Sync Absences
-  useEffect(() => {
-    consultationService.saveAbsences(absences);
-  }, [absences]);
 
   return (
     <div className="relative">

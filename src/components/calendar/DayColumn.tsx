@@ -76,7 +76,7 @@ export const DayColumn: React.FC<DayColumnProps> = ({
                 const baseClass = isPast && app.status === 'AVAILABLE' ? 'bg-gray-50 border-gray-100 text-gray-400 opacity-50' : colors[app.status]
                 const isOwn = currentPatientId && app.patientId === currentPatientId;
                 const isDoctorView = !currentPatientId;
-                const isClickable = onSlotClick && !isPast && (
+                const isClickable = onSlotClick && !isPast && !isAbsenceDay && (
                     app.status === 'AVAILABLE' ||
                     (app.status === 'BOOKED' && (isDoctorView || isOwn)) ||
                     (app.status === 'PENDING_PAYMENT' && isOwn)
@@ -89,7 +89,8 @@ export const DayColumn: React.FC<DayColumnProps> = ({
                             baseClass,
                             app.status !== 'AVAILABLE' && typeColors[app.type],
                             isClickable ? "cursor-pointer hover:ring-2 hover:ring-blue-400" : "cursor-default",
-                            isOwn && "ring-2 ring-blue-600 ring-offset-0 shadow-md"
+                            isOwn && "ring-2 ring-blue-600 ring-offset-0 shadow-md",
+                            isAbsenceDay && "opacity-40 grayscale pointer-events-none"
                         )}
                         style={{ top: top, height: height, minHeight: 20 }}
                         title={`${app.status} - ${app.type}`}

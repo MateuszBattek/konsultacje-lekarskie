@@ -7,6 +7,7 @@ import { AvailabilityModal } from "./AvailabilityModal";
 import { AbsenceModal } from "./AbsenceModal";
 import { AppointmentDetailModal } from "./AppointmentDetailModal";
 import type { Appointment, AvailabilityRule, WeekDay, Absence } from "../../types";
+import { consultationService } from "../../services/consultationServices";
 
 interface CalendarViewProps {
     appointments: Appointment[];
@@ -31,8 +32,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     const handleNextWeek = () => setCurrentDate(addWeeks(currentDate, 1));
     const handleToday = () => setCurrentDate(new Date());
 
-    const handleSaveAvailability = (rule: AvailabilityRule) => {
-        const newAppointments: Appointment[] = [];
+    const handleSaveAvailability = async (rule: AvailabilityRule) => {
+        const newAppointments: Omit<Appointment, 'id'>[] = [];
         let datesToProcess: Date[] = [];
 
         if (rule.type === 'ONETIME' && rule.singleDate) {
@@ -49,6 +50,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         }
 
         datesToProcess.forEach(date => {
+            const dateStr = format(date, 'yyyy-MM-dd');
+            const isAbsenceDay = absences.some(abs => {
+                const startStr = format(abs.startDate, 'yyyy-MM-dd');
+                const endStr = format(abs.endDate, 'yyyy-MM-dd');
+                return dateStr >= startStr && dateStr <= endStr;
+            });
+
+            if (isAbsenceDay) return;
+
             rule.timeRanges.forEach(range => {
                 const [startHour, startMinute] = range.start.split(':').map(Number);
                 const [endHour, endMinute] = range.end.split(':').map(Number);
@@ -59,9 +69,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 while (isBefore(slotStart, rangeEnd)) {
                     const slotEnd = addMinutes(slotStart, 30);
 
-                    // Check logic to not exceed range end
                     if (isBefore(slotEnd, rangeEnd) || slotEnd.getTime() === rangeEnd.getTime()) {
-                        // Check for overlaps with existing appointments
                         const isOverlapping = appointments.some(existing => {
                             const existingStart = new Date(existing.startTime);
                             const existingEnd = addMinutes(existingStart, existing.durationMinutes);
@@ -77,8 +85,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                         if (!isOverlapping) {
                             newAppointments.push({
-                                id: Math.random().toString(36).substr(2, 9),
-                                doctorId: '1', // Hardcoded for now
+                                doctorId: 'd1',
                                 startTime: slotStart.toISOString(),
                                 durationMinutes: 30,
                                 status: 'AVAILABLE',
@@ -91,44 +98,56 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             });
         });
 
-        setAppointments([...appointments, ...newAppointments]);
+        try {
+            const savedAppointments = await consultationService.bulkCreateAppointments(newAppointments);
+            setAppointments([...appointments, ...savedAppointments]);
+        } catch (error) {
+            console.error("Failed to save availability:", error);
+        }
     };
 
-    const handleSaveAbsence = (absenceData: Omit<Absence, 'id'>) => {
-        const newAbsence: Absence = {
-            id: Math.random().toString(36).substr(2, 9),
-            ...absenceData
-        };
+    const handleSaveAbsence = async (absenceData: Omit<Absence, 'id'>) => {
+        try {
+            const newAbsence = await consultationService.createAbsence(absenceData);
 
-        // Process appointments: remove AVAILABLE slots and cancel BOOKED ones
-        const updatedAppointments = appointments.reduce<Appointment[]>((acc, apt) => {
-            const aptDate = new Date(apt.startTime);
-            const aptDateStr = format(aptDate, 'yyyy-MM-dd');
-            const startStr = format(absenceData.startDate, 'yyyy-MM-dd');
-            const endStr = format(absenceData.endDate, 'yyyy-MM-dd');
+            const toDelete: string[] = [];
+            const toCancel: string[] = [];
 
-            const isConflicting = aptDateStr >= startStr && aptDateStr <= endStr;
+            appointments.forEach(apt => {
+                const aptDate = new Date(apt.startTime);
+                const aptDateStr = format(aptDate, 'yyyy-MM-dd');
+                const startStr = format(absenceData.startDate, 'yyyy-MM-dd');
+                const endStr = format(absenceData.endDate, 'yyyy-MM-dd');
 
-            if (isConflicting) {
-                if (apt.status === 'AVAILABLE' || apt.status === 'PENDING_PAYMENT') {
-                    return acc; // Skip available or pending slots
+                const isConflicting = aptDateStr >= startStr && aptDateStr <= endStr;
+
+                if (isConflicting) {
+                    if (apt.status === 'AVAILABLE' || apt.status === 'PENDING_PAYMENT') {
+                        toDelete.push(apt.id);
+                    } else if (apt.status === 'BOOKED') {
+                        toCancel.push(apt.id);
+                    }
                 }
-                if (apt.status === 'BOOKED') {
-                    // Mock patient notification
-                    console.log(`🔔 Notification sent to patient: Appointment on ${format(aptDate, 'yyyy-MM-dd HH:mm')} has been cancelled due to doctor absence.`);
-                    alert(`Powiadomienie wysłane do pacjenta: Konsultacja ${format(aptDate, 'yyyy-MM-dd HH:mm')} została odwołana z powodu nieobecności lekarza.`);
+            });
 
-                    acc.push({ ...apt, status: 'CANCELLED' as const });
-                    return acc;
-                }
+            // Process conflicts
+            await Promise.all([
+                ...toDelete.map(id => consultationService.deleteAppointment(id)),
+                ...toCancel.map(id => consultationService.updateAppointment(id, { status: 'CANCELLED' }))
+            ]);
+
+            setAbsences([...absences, newAbsence]);
+
+            // Refresh appointments from server
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+
+            if (toCancel.length > 0) {
+                alert(`Dodano nieobecność. ${toCancel.length} rezerwacji zostało odwołanych.`);
             }
-
-            acc.push(apt);
-            return acc;
-        }, []);
-
-        setAbsences([...absences, newAbsence]);
-        setAppointments(updatedAppointments);
+        } catch (error) {
+            console.error("Failed to handle absence:", error);
+        }
     };
 
     const handleSlotClick = (appointment: Appointment) => {
@@ -140,7 +159,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         }
     };
 
-    const handleCancelAppointment = (appointmentId: string) => {
+    const handleCancelAppointment = async (appointmentId: string) => {
         const appointmentToCancel = appointments.find(a => a.id === appointmentId);
         if (!appointmentToCancel) return;
 
@@ -148,26 +167,34 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         const duration = appointmentToCancel.durationMinutes;
         const requiredSlots = duration / 30;
 
-        const updatedAppointments = appointments.map(apt => {
+        const toUpdate: string[] = [];
+
+        appointments.forEach(apt => {
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
                 if (aptTime.getTime() === checkTime.getTime() && (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT')) {
-                    return {
-                        ...apt,
-                        status: 'AVAILABLE' as const,
-                        patientId: undefined,
-                        patientName: undefined,
-                        notes: undefined,
-                        isSubSlot: undefined
-                    };
+                    toUpdate.push(apt.id);
                 }
             }
-            return apt;
         });
 
-        setAppointments(updatedAppointments);
-        console.log(`❌ Appointment ${appointmentId} cancelled by doctor.`);
+        try {
+            await Promise.all(toUpdate.map(id =>
+                consultationService.updateAppointment(id, {
+                    status: 'AVAILABLE',
+                    patientId: undefined,
+                    patientName: undefined,
+                    notes: undefined
+                })
+            ));
+
+            const freshAppointments = await consultationService.getAllAppointments();
+            setAppointments(freshAppointments);
+            console.log(`❌ Appointment ${appointmentId} cancelled by doctor.`);
+        } catch (error) {
+            console.error("Failed to cancel appointment:", error);
+        }
     };
 
     return (

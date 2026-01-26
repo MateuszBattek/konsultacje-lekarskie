@@ -1,67 +1,100 @@
 import type { Appointment, Absence } from '../types';
-import initialData from '../data/db.json';
 
-const STORAGE_KEY = 'lekarskie_konsultacje_data';
+const BASE_URL = 'http://localhost:5000/api';
 
-interface Database {
-    appointments: Appointment[];
-    absences: Absence[];
-}
+const mapAppointment = (apt: any): Appointment => ({
+    ...apt,
+    id: apt._id,
+    startTime: apt.startTime
+});
 
-const getStoredData = (): Database => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-        try {
-            const parsed = JSON.parse(stored);
-            // Ensure dates are correctly parsed if necessary, though ISO strings work fine with new Date()
-            return parsed;
-        } catch (e) {
-            console.error('Failed to parse stored data', e);
-        }
-    }
-
-    // Fallback to db.json seed
-    return {
-        appointments: initialData.appointments as Appointment[],
-        absences: (initialData.absences || []).map((abs: any) => ({
-            ...abs,
-            startDate: new Date(abs.startDate),
-            endDate: new Date(abs.endDate)
-        }))
-    };
-};
-
-const saveData = (data: Database) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-};
+const mapAbsence = (abs: any): Absence => ({
+    ...abs,
+    id: abs._id,
+    startDate: new Date(abs.startDate),
+    endDate: new Date(abs.endDate)
+});
 
 export const consultationService = {
-    getAllAppointments: (): Appointment[] => {
-        return getStoredData().appointments;
+    getAllAppointments: async (): Promise<Appointment[]> => {
+        const response = await fetch(`${BASE_URL}/appointments`);
+        const data = await response.json();
+        return data.map(mapAppointment);
     },
 
-    saveAppointments: (appointments: Appointment[]) => {
-        const data = getStoredData();
-        data.appointments = appointments;
-        saveData(data);
+    createAppointment: async (appointment: Omit<Appointment, 'id'>): Promise<Appointment> => {
+        const response = await fetch(`${BASE_URL}/appointments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointment)
+        });
+        const data = await response.json();
+        return mapAppointment(data);
     },
 
-    getAllAbsences: (): Absence[] => {
-        const data = getStoredData();
-        return data.absences.map(abs => ({
-            ...abs,
-            startDate: new Date(abs.startDate),
-            endDate: new Date(abs.endDate)
-        }));
+    bulkCreateAppointments: async (appointments: Omit<Appointment, 'id'>[]): Promise<Appointment[]> => {
+        const response = await fetch(`${BASE_URL}/appointments/bulk`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointments)
+        });
+        const data = await response.json();
+        return data.map(mapAppointment);
     },
 
-    saveAbsences: (absences: Absence[]) => {
-        const data = getStoredData();
-        data.absences = absences;
-        saveData(data);
+    updateAppointment: async (id: string, appointment: Partial<Appointment>): Promise<Appointment> => {
+        const response = await fetch(`${BASE_URL}/appointments/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(appointment)
+        });
+        const data = await response.json();
+        return mapAppointment(data);
     },
 
-    clearAllData: () => {
-        localStorage.removeItem(STORAGE_KEY);
+    bulkUpdateAppointments: async (updates: { id: string, data: Partial<Appointment> }[]): Promise<void> => {
+        await fetch(`${BASE_URL}/appointments/bulk`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updates)
+        });
+    },
+
+    deleteAppointment: async (id: string): Promise<void> => {
+        await fetch(`${BASE_URL}/appointments/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
+    getAllAbsences: async (): Promise<Absence[]> => {
+        const response = await fetch(`${BASE_URL}/absences`);
+        const data = await response.json();
+        return data.map(mapAbsence);
+    },
+
+    createAbsence: async (absence: Omit<Absence, 'id'>): Promise<Absence> => {
+        const response = await fetch(`${BASE_URL}/absences`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(absence)
+        });
+        const data = await response.json();
+        return mapAbsence(data);
+    },
+
+    updateAbsence: async (id: string, absence: Partial<Absence>): Promise<Absence> => {
+        const response = await fetch(`${BASE_URL}/absences/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(absence)
+        });
+        const data = await response.json();
+        return mapAbsence(data);
+    },
+
+    deleteAbsence: async (id: string): Promise<void> => {
+        await fetch(`${BASE_URL}/absences/${id}`, {
+            method: 'DELETE'
+        });
     }
 };

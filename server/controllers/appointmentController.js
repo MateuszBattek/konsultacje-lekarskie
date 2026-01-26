@@ -2,7 +2,9 @@ import { Appointment } from '../models/Appointment.js';
 
 export const getAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.find();
+        const { doctorId } = req.query;
+        const filter = doctorId ? { doctorId } : {};
+        const appointments = await Appointment.find(filter);
         res.status(200).json(appointments);
     } catch (error) {
         res.status(500).json({ message: error.message });

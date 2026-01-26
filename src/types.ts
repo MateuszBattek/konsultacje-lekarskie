@@ -1,5 +1,25 @@
 export type UserRole = 'DOCTOR' | 'PATIENT'
 
+export const SPECIALIZATIONS = [
+    'Kardiolog',
+    'Pediatra',
+    'Dermatolog',
+    'Neurolog',
+    'Ortopeda',
+    'Okulista',
+    'Ginekolog',
+    'Psychiatra',
+    'Endykronolog',
+    'Gastrolog',
+    'Onkolog',
+    'Urolog',
+    'Internista',
+    'Chirurg',
+    'Laryngolog'
+] as const;
+
+export type Specialization = typeof SPECIALIZATIONS[number];
+
 export interface User {
     id: string,
     name: string,

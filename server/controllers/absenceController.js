@@ -2,7 +2,9 @@ import { Absence } from '../models/Absence.js';
 
 export const getAbsences = async (req, res) => {
     try {
-        const absences = await Absence.find();
+        const { doctorId } = req.query;
+        const filter = doctorId ? { doctorId } : {};
+        const absences = await Absence.find(filter);
         res.status(200).json(absences);
     } catch (error) {
         res.status(500).json({ message: error.message });

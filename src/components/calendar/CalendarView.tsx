@@ -1,5 +1,5 @@
 import { addDays, addMinutes, format, isBefore, isSameDay, set, subWeeks, addWeeks } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 import { WeekGrid } from "./WeekGrid";
@@ -14,13 +14,15 @@ interface CalendarViewProps {
     setAppointments: (appointments: Appointment[]) => void;
     absences: Absence[];
     setAbsences: (absences: Absence[]) => void;
+    doctorId: string;
 }
 
 export const CalendarView: React.FC<CalendarViewProps> = ({
     appointments,
     setAppointments,
     absences,
-    setAbsences
+    setAbsences,
+    doctorId
 }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [isAvailabilityModalOpen, setIsAvailabilityModalOpen] = useState(false);
@@ -85,7 +87,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
                         if (!isOverlapping) {
                             newAppointments.push({
-                                doctorId: 'd1',
+                                doctorId: doctorId,
                                 startTime: slotStart.toISOString(),
                                 durationMinutes: 30,
                                 status: 'AVAILABLE',
@@ -108,7 +110,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
     const handleSaveAbsence = async (absenceData: Omit<Absence, 'id'>) => {
         try {
-            const newAbsence = await consultationService.createAbsence(absenceData);
+            // Add doctorId to absence data
+            const absenceWithDoctor = {
+                ...absenceData,
+                doctorId: doctorId
+            };
+
+            const newAbsence = await consultationService.createAbsence(absenceWithDoctor);
 
             const toDelete: string[] = [];
             const toCancel: string[] = [];
@@ -139,7 +147,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             setAbsences([...absences, newAbsence]);
 
             // Refresh appointments from server
-            const freshAppointments = await consultationService.getAllAppointments();
+            const freshAppointments = await consultationService.getAllAppointments(doctorId);
             setAppointments(freshAppointments);
 
             if (toCancel.length > 0) {
@@ -189,7 +197,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 })
             ));
 
-            const freshAppointments = await consultationService.getAllAppointments();
+            const freshAppointments = await consultationService.getAllAppointments(doctorId);
             setAppointments(freshAppointments);
             console.log(`❌ Appointment ${appointmentId} cancelled by doctor.`);
         } catch (error) {
@@ -201,16 +209,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
         <div className="flex flex-col h-screen max-h-screen bg-gray-50 p-6">
 
 
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                        <CalendarIcon size={24} />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">dr Jan Kowalski</h1>
-                        <p className="text-sm text-gray-500">Kardiolog - Harmonogram</p>
-                    </div>
-                </div>
+            <div className="flex items-center justify-end mb-6">
 
                 <div className="flex items-center gap-4">
                     <button
@@ -263,19 +262,57 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 />
             </div>
 
-            <div className="mt-4 flex space-x-6 text-sm text-gray-600">
-                <div className="flex items-center">
-                    <div className="w-3 h-3 bg-green-100 border border-green-300 rounded mr-2"></div>
-                    Available
+            <div className="mt-4 flex justify-between items-start">
+                <div className="flex space-x-6 text-sm text-gray-600">
+                    <div className="flex items-center">
+                        <div className="w-3 h-3 bg-green-100 border border-green-300 rounded mr-2"></div>
+                        Available
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded mr-2"></div>
+                        Booked
+                    </div>
+                    <div className="flex items-center">
+                        <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded mr-2"></div>
+                        Completed
+                    </div>
                 </div>
-                <div className="flex items-center">
-                    <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded mr-2"></div>
-                    Booked
-                </div>
-                <div className="flex items-center">
-                    <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded mr-2"></div>
-                    Completed
-                </div>
+
+                {/* Absences List */}
+                {absences.length > 0 && (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 max-w-md">
+                        <h3 className="text-sm font-semibold text-gray-700 mb-2">Twoje nieobecności:</h3>
+                        <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {absences.map(absence => (
+                                <div key={absence.id} className="flex items-center justify-between text-xs bg-red-50 p-2 rounded border border-red-200">
+                                    <div>
+                                        <div className="font-medium text-red-700">
+                                            {format(absence.startDate, 'dd.MM.yyyy')} - {format(absence.endDate, 'dd.MM.yyyy')}
+                                        </div>
+                                        {absence.reason && <div className="text-gray-600 text-[10px]">{absence.reason}</div>}
+                                    </div>
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm('Czy na pewno chcesz usunąć tę nieobecność?')) {
+                                                try {
+                                                    await consultationService.deleteAbsence(absence.id);
+                                                    setAbsences(absences.filter(a => a.id !== absence.id));
+                                                    const freshAppointments = await consultationService.getAllAppointments(doctorId);
+                                                    setAppointments(freshAppointments);
+                                                } catch (error) {
+                                                    console.error("Failed to delete absence:", error);
+                                                }
+                                            }
+                                        }}
+                                        className="ml-2 px-2 py-1 text-red-600 hover:bg-red-100 rounded text-[10px] font-medium"
+                                    >
+                                        Usuń
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <AvailabilityModal

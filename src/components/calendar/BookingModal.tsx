@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Appointment, BookingFormData, Gender, AppointmentType } from '../../types';
 import { X, Upload, FileText } from 'lucide-react';
-import { format, addMinutes } from 'date-fns';
+import { format, addMinutes, differenceInYears } from 'date-fns';
 
 interface BookingModalProps {
     isOpen: boolean;
@@ -9,6 +9,7 @@ interface BookingModalProps {
     onSave: (bookingData: BookingFormData) => void;
     selectedSlot: Appointment | null;
     availableSlots: Appointment[];
+    currentUser: any;
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({
@@ -16,7 +17,8 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     onClose,
     onSave,
     selectedSlot,
-    availableSlots
+    availableSlots,
+    currentUser
 }) => {
     const [patientName, setPatientName] = useState('');
     const [patientGender, setPatientGender] = useState<Gender>('MALE');
@@ -26,6 +28,16 @@ export const BookingModal: React.FC<BookingModalProps> = ({
     const [notes, setNotes] = useState('');
     const [documents, setDocuments] = useState<File[]>([]);
     const [conflictError, setConflictError] = useState('');
+
+    useEffect(() => {
+        if (isOpen && currentUser) {
+            setPatientName(currentUser.name || '');
+            if (currentUser.dateOfBirth) {
+                const age = differenceInYears(new Date(), new Date(currentUser.dateOfBirth));
+                setPatientAge(age.toString());
+            }
+        }
+    }, [isOpen, currentUser]);
 
     if (!isOpen || !selectedSlot) return null;
 

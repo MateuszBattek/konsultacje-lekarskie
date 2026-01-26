@@ -1,10 +1,13 @@
-import { isArbitraryPosition } from './../../node_modules/tailwind-merge/src/lib/validators';
 import { addDays, formatISO, setHours, setMinutes, startOfWeek } from 'date-fns';
 import type { Appointment, User } from "../types";
 
 export const DOCTORS: User[] = [
     { id: 'd1', name: 'dr Jan Kowalski', role: 'DOCTOR', specialization: 'Kardiolog' },
     { id: 'd2', name: 'dr Urszula Nowak', role: 'DOCTOR', specialization: 'Dermatolog' },
+    { id: 'd3', name: 'dr Anna Wiśniewska', role: 'DOCTOR', specialization: 'Kardiolog' },
+    { id: 'd4', name: 'dr Piotr Lewandowski', role: 'DOCTOR', specialization: 'Pediatra' },
+    { id: 'd5', name: 'dr Maria Kamińska', role: 'DOCTOR', specialization: 'Neurolog' },
+    { id: 'd6', name: 'dr Tomasz Zieliński', role: 'DOCTOR', specialization: 'Kardiolog' },
 ]
 
 export const PATIENTS: User[] = [
@@ -50,9 +53,12 @@ const generateAppointments = (): Appointment[] => {
                     if (Math.random() > 0.6) type = 'FOLLOW_UP';
                     else if (Math.random() > 0.8) type = 'PRESCRIPTION';
 
+                    // Generate for multiple doctors (randomly select)
+                    const doctor = DOCTORS[Math.floor(Math.random() * DOCTORS.length)];
+
                     apps.push({
-                        id: `app-${formatISO(startTime)}`,
-                        doctorId: DOCTORS[0].id,
+                        id: `app-${doctor.id}-${formatISO(startTime)}`,
+                        doctorId: doctor.id,
                         patientId,
                         startTime: formatISO(startTime),
                         durationMinutes: 30,

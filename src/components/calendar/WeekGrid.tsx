@@ -1,4 +1,4 @@
-import { addDays, format, isSameDay, startOfWeek } from "date-fns";
+import { addDays, format, isSameDay, startOfWeek, parseISO } from "date-fns";
 import type { Appointment, Absence } from "../../types";
 import { cn } from "../../lib/utils";
 import { DayColumn } from "./DayColumn";
@@ -9,9 +9,10 @@ interface WeekGridProps {
     absences: Absence[];
     onSlotClick?: (appointment: Appointment) => void;
     currentPatientId?: string;
+    doctors?: Record<string, { name: string; specialization?: string }>;
 }
 
-export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, absences, onSlotClick, currentPatientId }) => {
+export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, absences, onSlotClick, currentPatientId, doctors }) => {
     const weekStart = startOfWeek(startDate, { weekStartsOn: 1 });
     const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
     const START_HOUR = 8;
@@ -22,9 +23,15 @@ export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, abs
             <div className="flex border-b border-gray-200 overflow-y-auto [scrollbar-gutter:stable]">
                 <div className="w-16 flex-shrink-0 border-r border-gray-100 bg-gray-50"></div>
                 {days.map(day => {
-                    const count = appointments.filter(a => isSameDay(new Date(a.startTime), day)).length;
+                    const count = appointments.filter(a =>
+                        isSameDay(parseISO(a.startTime), day) &&
+                        a.status === 'BOOKED' &&
+                        !a.isSubSlot
+                    ).length;
                     const dateStr = format(day, 'yyyy-MM-dd');
-                    const isAbsenceDay = absences.some(absence => {
+
+                    // Only show absences for doctors (when currentPatientId is not set)
+                    const isAbsenceDay = !currentPatientId && absences.some(absence => {
                         const startStr = format(absence.startDate, 'yyyy-MM-dd');
                         const endStr = format(absence.endDate, 'yyyy-MM-dd');
                         return dateStr >= startStr && dateStr <= endStr;
@@ -70,6 +77,7 @@ export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, abs
                             endHour={END_HOUR}
                             onSlotClick={onSlotClick}
                             currentPatientId={currentPatientId}
+                            doctors={doctors}
                         />
                     ))}
                 </div>

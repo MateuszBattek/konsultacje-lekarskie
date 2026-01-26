@@ -1,27 +1,32 @@
 import { addWeeks, format, subWeeks, addMinutes } from "date-fns";
-import { CalendarIcon, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import type React from "react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { WeekGrid } from "./WeekGrid";
 import { BookingModal } from "./BookingModal";
 import { AppointmentDetailModal } from "./AppointmentDetailModal";
 import { CartPanel, calculatePrice } from "../cart/CartPanel";
 import { PaymentModal } from "../cart/PaymentModal";
-import type { Appointment, BookingFormData, Absence, CartItem } from "../../types";
+import { SpecializationSelector } from "./SpecializationSelector";
+import type { Appointment, BookingFormData, Absence, CartItem, User } from "../../types";
 import { consultationService } from "../../services/consultationServices";
 
 interface PatientCalendarViewProps {
     appointments: Appointment[];
     setAppointments: (appointments: Appointment[]) => void;
     absences: Absence[];
-    currentPatientId: string;
+    userResult: any;
+}
+
+interface DoctorMap {
+    [doctorId: string]: User;
 }
 
 export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
     appointments,
     setAppointments,
     absences,
-    currentPatientId
+    userResult
 }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -30,6 +35,27 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedSlot, setSelectedSlot] = useState<Appointment | null>(null);
     const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+    const [selectedSpecialization, setSelectedSpecialization] = useState('Kardiolog');
+    const [doctors, setDoctors] = useState<DoctorMap>({});
+
+    // Fetch all doctors to build a map of doctorId -> doctor info
+    useEffect(() => {
+        const fetchDoctors = async () => {
+            try {
+                const doctorsList = await consultationService.getDoctors();
+                const doctorMap: DoctorMap = {};
+
+                doctorsList.forEach(doctor => {
+                    doctorMap[doctor.id] = doctor;
+                });
+
+                setDoctors(doctorMap);
+            } catch (error) {
+                console.error('Failed to fetch doctors:', error);
+            }
+        };
+        fetchDoctors();
+    }, []);
 
     const handlePrevWeek = () => setCurrentDate(subWeeks(currentDate, 1));
     const handleNextWeek = () => setCurrentDate(addWeeks(currentDate, 1));
@@ -39,7 +65,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
         if (appointment.status === 'AVAILABLE') {
             setSelectedSlot(appointment);
             setIsBookingModalOpen(true);
-        } else if ((appointment.status === 'BOOKED' || appointment.status === 'PENDING_PAYMENT') && appointment.patientId === currentPatientId) {
+        } else if ((appointment.status === 'BOOKED' || appointment.status === 'PENDING_PAYMENT') && appointment.patientId === userResult._id) {
             setSelectedAppointment(appointment);
             setIsDetailModalOpen(true);
         }
@@ -63,7 +89,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
                         id: apt.id,
                         data: {
                             status: 'PENDING_PAYMENT',
-                            patientId: currentPatientId,
+                            patientId: userResult._id,
                             patientName: bookingData.patientName,
                             type: bookingData.consultationType,
                             durationMinutes: i === 0 ? bookingData.durationMinutes : 30,
@@ -87,12 +113,12 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
     const cartItems = useMemo<CartItem[]>(() => {
         return appointments
-            .filter(apt => apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId && !apt.isSubSlot)
+            .filter(apt => apt.status === 'PENDING_PAYMENT' && apt.patientId === userResult._id && !apt.isSubSlot)
             .map(apt => ({
                 appointment: apt,
                 price: calculatePrice(apt)
             }));
-    }, [appointments, currentPatientId]);
+    }, [appointments, userResult._id]);
 
     const handleRemoveFromCart = async (appointmentId: string) => {
         const appointmentToRemove = appointments.find(a => a.id === appointmentId);
@@ -108,7 +134,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
-                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId) {
+                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'PENDING_PAYMENT' && apt.patientId === userResult._id) {
                     updates.push({
                         id: apt.id,
                         data: {
@@ -134,7 +160,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
     const handlePaymentComplete = async () => {
         const updates = appointments
-            .filter(apt => apt.status === 'PENDING_PAYMENT' && apt.patientId === currentPatientId)
+            .filter(apt => apt.status === 'PENDING_PAYMENT' && apt.patientId === userResult._id)
             .map(apt => ({
                 id: apt.id,
                 data: { status: 'BOOKED' as const }
@@ -165,7 +191,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
-                if (aptTime.getTime() === checkTime.getTime() && (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === currentPatientId) {
+                if (aptTime.getTime() === checkTime.getTime() && (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === userResult._id) {
                     updates.push({
                         id: apt.id,
                         data: {
@@ -192,19 +218,36 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
 
+    // Filter appointments for patient view
+    const filteredAppointments = useMemo(() => {
+        return appointments.filter(apt => {
+            // Filter by specialization - we need doctor info
+            // For now, we'll need to get this from the backend or store it
+            // This is a placeholder - in production, fetch doctor details
+            const doctor = doctors[apt.doctorId];
+            const matchesSpecialization = doctor?.specialization === selectedSpecialization;
+
+            // Show only AVAILABLE or patient's own appointments
+            const isAvailable = apt.status === 'AVAILABLE';
+            const isOwnAppointment = apt.patientId === userResult._id;
+
+            return matchesSpecialization && (isAvailable || isOwnAppointment);
+        });
+    }, [appointments, selectedSpecialization, doctors, userResult._id]);
+
     return (
         <div className="flex flex-col h-screen max-h-screen bg-gray-50 p-6 relative">
             <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 rounded-lg text-blue-600">
-                        <CalendarIcon size={24} />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900">dr Jan Kowalski</h1>
-                        <p className="text-sm text-gray-500">Kardiolog - Rezerwacja konsultacji</p>
-                    </div>
-                </div>
+                {/* Empty left space to avoid overlap */}
+                <div className="w-64"></div>
 
+                {/* Specialization Selector - Center */}
+                <SpecializationSelector
+                    selectedSpecialization={selectedSpecialization}
+                    onSpecializationChange={setSelectedSpecialization}
+                />
+
+                {/* Navigation Controls - Right Side */}
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setIsCartOpen(true)}
@@ -242,10 +285,11 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             <div className="flex-1 overflow-hidden">
                 <WeekGrid
                     startDate={currentDate}
-                    appointments={appointments}
+                    appointments={filteredAppointments}
                     absences={absences}
                     onSlotClick={handleSlotClick}
-                    currentPatientId={currentPatientId}
+                    currentPatientId={userResult._id}
+                    doctors={doctors}
                 />
             </div>
 
@@ -280,6 +324,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
                 onSave={handleBooking}
                 selectedSlot={selectedSlot}
                 availableSlots={appointments.filter(apt => apt.status === 'AVAILABLE')}
+                currentUser={userResult}
             />
 
             <CartPanel

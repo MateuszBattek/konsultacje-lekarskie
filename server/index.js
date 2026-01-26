@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 
 import appointmentRoutes from './routes/appointmentRoutes.js';
 import absenceRoutes from './routes/absenceRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/absences', absenceRoutes);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 const CONNECTION_URL = process.env.MONGODB_URI;

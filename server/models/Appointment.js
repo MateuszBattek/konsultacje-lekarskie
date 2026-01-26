@@ -17,7 +17,8 @@ const appointmentSchema = new mongoose.Schema({
         required: true
     },
     notes: { type: String },
-    price: { type: Number }
+    price: { type: Number },
+    isSubSlot: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export const Appointment = mongoose.model('Appointment', appointmentSchema);

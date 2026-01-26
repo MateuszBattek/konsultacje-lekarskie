@@ -141,10 +141,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
-                                <strong>Symulacja płatności:</strong> To jest testowe środowisko. Wprowadź dowolne dane.
-                            </div>
                         </div>
 
                         <div className="p-4 border-t bg-gray-50 flex justify-end gap-2">

@@ -89,8 +89,8 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                     {/* Status Badge */}
                     <div className="pt-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${appointment.status === 'BOOKED'
-                                ? 'bg-blue-100 text-blue-700'
-                                : 'bg-orange-100 text-orange-700'
+                            ? 'bg-blue-100 text-blue-700'
+                            : 'bg-orange-100 text-orange-700'
                             }`}>
                             {appointment.status === 'BOOKED' ? 'Zatwierdzona' : 'Oczekuje na płatność'}
                         </span>
@@ -142,6 +142,6 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };

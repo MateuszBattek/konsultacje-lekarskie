@@ -1,16 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, UserCheck, Stethoscope, ArrowRight, Eye, EyeOff, Calendar } from 'lucide-react';
 import { consultationService } from '../../services/consultationServices';
+import { SPECIALIZATIONS } from '../../types';
 
 interface AuthProps {
     onAuthSuccess: (user: any) => void;
 }
-
-const specializations = [
-    'Kardiolog', 'Pediatra', 'Dermatolog', 'Neurolog', 'Ortopeda',
-    'Okulista', 'Ginekolog', 'Psychiatra', 'Endokrynolog', 'Gastrolog',
-    'Onkolog', 'Urolog', 'Internista', 'Chirurg', 'Laryngolog'
-];
 
 export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     const [isSignup, setIsSignup] = useState(false);
@@ -24,7 +19,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         password: '',
         confirmPassword: '',
         role: 'PATIENT',
-        specialization: specializations[0],
+        specialization: SPECIALIZATIONS[0],
         dateOfBirth: ''
     });
 
@@ -210,7 +205,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
                                             value={formData.specialization}
                                             className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none appearance-none bg-white font-medium"
                                         >
-                                            {specializations.map(spec => (
+                                            {SPECIALIZATIONS.map(spec => (
                                                 <option key={spec} value={spec}>{spec}</option>
                                             ))}
                                         </select>

@@ -22,11 +22,31 @@ export const createAppointment = async (req, res) => {
     }
 };
 
+import { Notification } from '../models/Notification.js';
+
 export const updateAppointment = async (req, res) => {
     const { id } = req.params;
     const { doctorId, patientId, patientName, startTime, durationMinutes, status, type, notes, price } = req.body;
 
     try {
+        const appointment = await Appointment.findById(id);
+
+        // Check if appointment is being cancelled (either set to CANCELLED or reset to AVAILABLE from BOOKED)
+        const isCancellation =
+            (appointment && appointment.status === 'BOOKED' && status === 'CANCELLED') ||
+            (appointment && appointment.status === 'BOOKED' && status === 'AVAILABLE' && (patientId === null || patientId === undefined));
+
+        if (isCancellation && !appointment.isSubSlot) {
+            const date = new Date(appointment.startTime).toLocaleDateString('pl-PL');
+            const time = new Date(appointment.startTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+            await Notification.create({
+                recipientId: appointment.patientId,
+                message: `Twoja wizyta z dnia ${date} o godzinie ${time} została odwołana przez lekarza.`,
+                type: 'CANCELLATION'
+            });
+        }
+
         const updatedAppointment = await Appointment.findByIdAndUpdate(id, {
             doctorId, patientId, patientName, startTime, durationMinutes, status, type, notes, price
         }, { new: true });
@@ -39,6 +59,20 @@ export const updateAppointment = async (req, res) => {
 export const deleteAppointment = async (req, res) => {
     const { id } = req.params;
     try {
+        const appointment = await Appointment.findById(id);
+
+        // Only send notification for main slots (not sub-slots)
+        if (appointment.status === 'BOOKED' && appointment.patientId && !appointment.isSubSlot) {
+            const date = new Date(appointment.startTime).toLocaleDateString('pl-PL');
+            const time = new Date(appointment.startTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+            await Notification.create({
+                recipientId: appointment.patientId,
+                message: `Twoja wizyta z dnia ${date} o godzinie ${time} została usunięta z grafiku przez lekarza.`,
+                type: 'CANCELLATION'
+            });
+        }
+
         await Appointment.findByIdAndDelete(id);
         res.status(200).json({ message: 'Appointment deleted successfully.' });
     } catch (error) {
@@ -59,6 +93,32 @@ export const bulkCreateAppointments = async (req, res) => {
 export const bulkUpdateAppointments = async (req, res) => {
     const updates = req.body; // Array of { id, data }
     try {
+        const cancelledUpdates = updates.filter(u => u.data.status === 'CANCELLED');
+
+        if (cancelledUpdates.length > 0) {
+            const ids = cancelledUpdates.map(u => u.id);
+            const appointmentsToNotify = await Appointment.find({
+                _id: { $in: ids },
+                status: 'BOOKED',
+                isSubSlot: { $ne: true }
+            });
+
+            const notifications = appointmentsToNotify.map(apt => {
+                const date = new Date(apt.startTime).toLocaleDateString('pl-PL');
+                const time = new Date(apt.startTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+                return {
+                    recipientId: apt.patientId,
+                    message: `Twoja wizyta z dnia ${date} o godzinie ${time} została odwołana z powodu nieobecności lekarza.`,
+                    type: 'CANCELLATION'
+                };
+            });
+
+            if (notifications.length > 0) {
+                await Notification.insertMany(notifications);
+            }
+        }
+
         const bulkOps = updates.map(update => ({
             updateOne: {
                 filter: { _id: update.id },

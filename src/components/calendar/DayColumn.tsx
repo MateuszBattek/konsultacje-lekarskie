@@ -133,7 +133,6 @@ export const DayColumn: React.FC<DayColumnProps> = ({
                                         <div className="flex items-center justify-between gap-1 font-semibold truncate text-[10px]">
                                             <div className="flex items-center gap-1">
                                                 {format(startDate, "HH:mm")}
-                                                {slotCount > 1 && <span className="text-[9px] opacity-70">({index + 1}/{slotCount})</span>}
                                             </div>
                                             {doctors[app.doctorId] && (
                                                 <div className="text-[8px] truncate opacity-70 max-w-[60%]">
@@ -141,7 +140,7 @@ export const DayColumn: React.FC<DayColumnProps> = ({
                                                 </div>
                                             )}
                                         </div>
-                                        {app.status === 'BOOKED' && <div className="text-[9px] truncate font-bold">{app.patientId ? 'Reserved' : 'Booked'}</div>}
+                                        {app.status === 'BOOKED' && <div className="text-[9px] truncate font-bold">{app.patientId ? 'Zarezerwowane' : 'Zajęte'}</div>}
                                     </div>
                                 );
                             })}

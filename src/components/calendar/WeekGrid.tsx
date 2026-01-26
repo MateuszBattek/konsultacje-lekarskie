@@ -1,7 +1,9 @@
 import { addDays, format, isSameDay, startOfWeek, parseISO } from "date-fns";
+import { pl } from 'date-fns/locale';
 import type { Appointment, Absence } from "../../types";
 import { cn } from "../../lib/utils";
 import { DayColumn } from "./DayColumn";
+import React from 'react';
 
 interface WeekGridProps {
     startDate: Date,
@@ -43,7 +45,7 @@ export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, abs
                         )}>
                             <div className={cn("text-xs font-semibold uppercase",
                                 isAbsenceDay ? "text-red-600" : "text-gray-500"
-                            )}>{format(day, 'EEE')}</div>
+                            )}>{format(day, 'EEE', { locale: pl })}</div>
                             <div className={cn("text-xl font-bold rounded-full w-8 h-8 flex items-center justify-center mx-auto my-1",
                                 isAbsenceDay ? "bg-red-600 text-white shadow-md" : (isSameDay(day, new Date()) ? "bg-blue-600 text-white shadow-md" : "text-gray-900")
                             )}>
@@ -51,7 +53,7 @@ export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, abs
                             </div>
                             <div className={cn("text-xs",
                                 isAbsenceDay ? "text-red-500" : "text-gray-400"
-                            )}>{isAbsenceDay ? 'Nieobecność' : `${count} appts`}</div>
+                            )}>{isAbsenceDay ? 'Nieobecność' : `${count} wizyt`}</div>
                         </div>
                     )
                 })}

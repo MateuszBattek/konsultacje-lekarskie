@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     },
     specialization: { type: String },
     dateOfBirth: { type: Date },
-    id: { type: String }
+    id: { type: String },
+    refreshToken: { type: String }
 }, { timestamps: true });
 
 export const User = mongoose.model('User', userSchema);

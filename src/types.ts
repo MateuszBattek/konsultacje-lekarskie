@@ -51,6 +51,15 @@ export interface TimeRange {
     end: string;   // HH:mm
 }
 
+export interface Notification {
+    _id: string;
+    recipientId: string;
+    message: string;
+    type: 'CANCELLATION' | 'SYSTEM';
+    isRead: boolean;
+    createdAt: string;
+}
+
 export interface AvailabilityRule {
     type: 'CYCLIC' | 'ONETIME';
     dateRange?: {

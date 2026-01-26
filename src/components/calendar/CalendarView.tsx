@@ -189,12 +189,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
         try {
             await Promise.all(toUpdate.map(id =>
-                consultationService.updateAppointment(id, {
-                    status: 'AVAILABLE',
-                    patientId: undefined,
-                    patientName: undefined,
-                    notes: undefined
-                })
+                consultationService.deleteAppointment(id)
             ));
 
             const freshAppointments = await consultationService.getAllAppointments(doctorId);
@@ -243,7 +238,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                             onClick={handleToday}
                             className="px-4 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
                         >
-                            Today
+                            Dzisiaj
                         </button>
                     </div>
                 </div>
@@ -266,15 +261,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 <div className="flex space-x-6 text-sm text-gray-600">
                     <div className="flex items-center">
                         <div className="w-3 h-3 bg-green-100 border border-green-300 rounded mr-2"></div>
-                        Available
+                        Dostępne
                     </div>
                     <div className="flex items-center">
                         <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded mr-2"></div>
-                        Booked
+                        Zarezerwowane
                     </div>
                     <div className="flex items-center">
                         <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded mr-2"></div>
-                        Completed
+                        Zakończone
                     </div>
                 </div>
 

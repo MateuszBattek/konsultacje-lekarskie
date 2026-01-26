@@ -2,6 +2,7 @@ import { addWeeks, format, subWeeks, addMinutes } from "date-fns";
 import { ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import type React from "react";
 import { useState, useMemo, useEffect } from "react";
+import { pl } from 'date-fns/locale';
 import { WeekGrid } from "./WeekGrid";
 import { BookingModal } from "./BookingModal";
 import { AppointmentDetailModal } from "./AppointmentDetailModal";
@@ -220,6 +221,13 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
     // Filter appointments for patient view
     const filteredAppointments = useMemo(() => {
+        // First, identify all time slots where the user already has a booking or pending payment
+        const userBookedTimes = new Set(
+            appointments
+                .filter(apt => (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === userResult._id)
+                .map(apt => new Date(apt.startTime).getTime())
+        );
+
         return appointments.filter(apt => {
             // Filter by specialization - we need doctor info
             // For now, we'll need to get this from the backend or store it
@@ -230,6 +238,14 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             // Show only AVAILABLE or patient's own appointments
             const isAvailable = apt.status === 'AVAILABLE';
             const isOwnAppointment = apt.patientId === userResult._id;
+
+            // If it's an available slot, check if it conflicts with user's existing booking
+            if (isAvailable) {
+                const slotTime = new Date(apt.startTime).getTime();
+                if (userBookedTimes.has(slotTime)) {
+                    return false; // Hide conflicting available slot
+                }
+            }
 
             return matchesSpecialization && (isAvailable || isOwnAppointment);
         });
@@ -266,7 +282,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
                             <ChevronLeft size={20} />
                         </button>
                         <div className="font-semibold text-lg w-48 text-center select-none">
-                            {format(currentDate, 'MMMM yyyy')}
+                            {format(currentDate, 'LLLL yyyy', { locale: pl })}
                         </div>
                         <button onClick={handleNextWeek} className="p-2 hover:bg-gray-100 rounded-md text-gray-600">
                             <ChevronRight size={20} />
@@ -276,7 +292,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
                             onClick={handleToday}
                             className="px-4 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors"
                         >
-                            Today
+                            Dzisiaj
                         </button>
                     </div>
                 </div>

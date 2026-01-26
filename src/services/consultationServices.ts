@@ -1,6 +1,5 @@
 import type { Appointment, Absence, User, Notification } from '../types';
 
-// Use environment variable or fallback to localhost
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const getHeaders = () => {
@@ -21,11 +20,9 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
         }
     });
 
-    // If unauthorized, try to refresh token
     if (response.status === 401) {
         const profile = localStorage.getItem('profile');
         if (!profile) {
-            // No profile, redirect to login
             localStorage.removeItem('profile');
             window.location.href = '/';
             throw new Error('Not authenticated');
@@ -33,14 +30,12 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
 
         const { refreshToken } = JSON.parse(profile);
         if (!refreshToken) {
-            // No refresh token, redirect to login
             localStorage.removeItem('profile');
             window.location.href = '/';
             throw new Error('No refresh token');
         }
 
         try {
-            // Try to refresh the access token
             const refreshResponse = await fetch(`${BASE_URL}/user/refresh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -48,7 +43,6 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
             });
 
             if (!refreshResponse.ok) {
-                // Refresh failed, logout user
                 localStorage.removeItem('profile');
                 window.location.href = '/';
                 throw new Error('Refresh token invalid');
@@ -56,14 +50,12 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
 
             const { token: newAccessToken } = await refreshResponse.json();
 
-            // Update stored profile with new access token
             const updatedProfile = {
                 ...JSON.parse(profile),
                 token: newAccessToken
             };
             localStorage.setItem('profile', JSON.stringify(updatedProfile));
 
-            // Retry original request with new token
             response = await fetch(url, {
                 ...options,
                 headers: {
@@ -73,7 +65,6 @@ const fetchWithAuth = async (url: string, options: RequestInit = {}): Promise<Re
                 }
             });
         } catch (error) {
-            // Refresh failed, logout user
             localStorage.removeItem('profile');
             window.location.href = '/';
             throw error;
@@ -97,7 +88,6 @@ const mapAbsence = (abs: any): Absence => ({
 });
 
 export const consultationService = {
-    // Auth
     signIn: async (formData: any) => {
         const response = await fetch(`${BASE_URL}/user/signin`, {
             method: 'POST',
@@ -138,7 +128,6 @@ export const consultationService = {
         }));
     },
 
-    // Appointments
     getAllAppointments: async (doctorId?: string): Promise<Appointment[]> => {
         const url = doctorId
             ? `${BASE_URL}/appointments?doctorId=${doctorId}`
@@ -188,7 +177,6 @@ export const consultationService = {
         });
     },
 
-    // Absences
     getAllAbsences: async (doctorId?: string): Promise<Absence[]> => {
         const url = doctorId
             ? `${BASE_URL}/absences?doctorId=${doctorId}`
@@ -222,9 +210,16 @@ export const consultationService = {
         });
     },
 
-    // Notifications
     getNotifications: async (userId: string): Promise<Notification[]> => {
         const response = await fetchWithAuth(`${BASE_URL}/notifications?userId=${userId}`);
+        return response.json();
+    },
+
+    createNotification: async (notification: Omit<Notification, '_id' | 'createdAt' | 'isRead'>): Promise<Notification> => {
+        const response = await fetchWithAuth(`${BASE_URL}/notifications`, {
+            method: 'POST',
+            body: JSON.stringify(notification)
+        });
         return response.json();
     },
 

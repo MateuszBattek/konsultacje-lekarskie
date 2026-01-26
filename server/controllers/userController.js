@@ -16,21 +16,18 @@ export const signin = async (req, res) => {
 
         if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials." });
 
-        // Generate access token (1 minute for testing)
         const accessToken = jwt.sign(
             { email: existingUser.email, id: existingUser._id, role: existingUser.role },
             secret,
-            { expiresIn: "1m" }
+            { expiresIn: "1h" }
         );
 
-        // Generate refresh token (7 days)
         const refreshToken = jwt.sign(
             { email: existingUser.email, id: existingUser._id },
             secret,
             { expiresIn: "7d" }
         );
 
-        // Store refresh token in database (single session enforcement)
         existingUser.refreshToken = refreshToken;
         await existingUser.save();
 
@@ -56,14 +53,12 @@ export const signup = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
-        // Generate access token (1 minute for testing)
         const accessToken = jwt.sign(
             { email, role: role || 'PATIENT' },
             secret,
-            { expiresIn: "1m" }
+            { expiresIn: "1h" }
         );
 
-        // Generate refresh token (7 days)
         const refreshToken = jwt.sign(
             { email },
             secret,
@@ -118,7 +113,7 @@ export const refreshToken = async (req, res) => {
         const newAccessToken = jwt.sign(
             { email: user.email, id: user._id, role: user.role },
             secret,
-            { expiresIn: "1m" }
+            { expiresIn: "1h" }
         );
 
         res.status(200).json({ token: newAccessToken });

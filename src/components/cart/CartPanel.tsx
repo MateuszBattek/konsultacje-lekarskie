@@ -38,15 +38,12 @@ export const CartPanel: React.FC<CartPanelProps> = ({
 
     return (
         <>
-            {/* Overlay */}
             <div
                 className="fixed inset-0 bg-black/30 z-40"
                 onClick={onClose}
             />
 
-            {/* Panel */}
             <div className="fixed right-0 top-0 h-full w-full max-w-md bg-white shadow-2xl z-50 flex flex-col">
-                {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-600 to-blue-700">
                     <div className="flex items-center gap-2 text-white">
                         <ShoppingCart size={24} />
@@ -60,7 +57,6 @@ export const CartPanel: React.FC<CartPanelProps> = ({
                     </button>
                 </div>
 
-                {/* Cart Items */}
                 <div className="flex-1 overflow-y-auto p-4">
                     {cartItems.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-gray-400">
@@ -114,7 +110,6 @@ export const CartPanel: React.FC<CartPanelProps> = ({
                     )}
                 </div>
 
-                {/* Footer */}
                 {cartItems.length > 0 && (
                     <div className="border-t bg-gray-50 p-4 space-y-3">
                         <div className="flex justify-between items-center text-lg font-bold">

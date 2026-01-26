@@ -32,7 +32,6 @@ export const WeekGrid: React.FC<WeekGridProps> = ({ startDate, appointments, abs
                     ).length;
                     const dateStr = format(day, 'yyyy-MM-dd');
 
-                    // Only show absences for doctors (when currentPatientId is not set)
                     const isAbsenceDay = !currentPatientId && absences.some(absence => {
                         const startStr = format(absence.startDate, 'yyyy-MM-dd');
                         const endStr = format(absence.endDate, 'yyyy-MM-dd');

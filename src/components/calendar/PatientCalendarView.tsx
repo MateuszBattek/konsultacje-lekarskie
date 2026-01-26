@@ -85,7 +85,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
-                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'AVAILABLE') {
+                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'AVAILABLE' && apt.doctorId === selectedSlot.doctorId) {
                     updates.push({
                         id: apt.id,
                         data: {
@@ -135,7 +135,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
-                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'PENDING_PAYMENT' && apt.patientId === userResult._id) {
+                if (aptTime.getTime() === checkTime.getTime() && apt.status === 'PENDING_PAYMENT' && apt.patientId === userResult._id && apt.doctorId === appointmentToRemove.doctorId) {
                     updates.push({
                         id: apt.id,
                         data: {
@@ -192,7 +192,11 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             const aptTime = new Date(apt.startTime);
             for (let i = 0; i < requiredSlots; i++) {
                 const checkTime = addMinutes(slotStart, i * 30);
-                if (aptTime.getTime() === checkTime.getTime() && (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === userResult._id) {
+                if (aptTime.getTime() === checkTime.getTime() &&
+                    (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') &&
+                    apt.patientId === userResult._id &&
+                    apt.doctorId === appointmentToCancel.doctorId
+                ) {
                     updates.push({
                         id: apt.id,
                         data: {
@@ -211,7 +215,7 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
             await consultationService.bulkUpdateAppointments(updates);
             const freshAppointments = await consultationService.getAllAppointments();
             setAppointments(freshAppointments);
-            console.log(`❌ Appointment ${appointmentId} cancelled by patient.`);
+            console.log(`Appointment ${appointmentId} cancelled by patient.`);
         } catch (error) {
             console.error("Failed to cancel appointment:", error);
         }
@@ -219,32 +223,37 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
 
     const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
 
-    // Filter appointments for patient view
     const filteredAppointments = useMemo(() => {
-        // First, identify all time slots where the user already has a booking or pending payment
-        const userBookedTimes = new Set(
-            appointments
-                .filter(apt => (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === userResult._id)
-                .map(apt => new Date(apt.startTime).getTime())
-        );
+        const userBookedRanges = appointments
+            .filter(apt => (apt.status === 'BOOKED' || apt.status === 'PENDING_PAYMENT') && apt.patientId === userResult._id)
+            .map(apt => {
+                const start = new Date(apt.startTime).getTime();
+                const end = start + apt.durationMinutes * 60000;
+                return { start, end };
+            });
 
         return appointments.filter(apt => {
-            // Filter by specialization - we need doctor info
-            // For now, we'll need to get this from the backend or store it
-            // This is a placeholder - in production, fetch doctor details
             const doctor = doctors[apt.doctorId];
             const matchesSpecialization = doctor?.specialization === selectedSpecialization;
 
-            // Show only AVAILABLE or patient's own appointments
             const isAvailable = apt.status === 'AVAILABLE';
             const isOwnAppointment = apt.patientId === userResult._id;
 
-            // If it's an available slot, check if it conflicts with user's existing booking
             if (isAvailable) {
-                const slotTime = new Date(apt.startTime).getTime();
-                if (userBookedTimes.has(slotTime)) {
-                    return false; // Hide conflicting available slot
+                const slotStart = new Date(apt.startTime).getTime();
+                const slotEnd = slotStart + apt.durationMinutes * 60000;
+
+                const hasConflict = userBookedRanges.some(range => {
+                    return (slotStart < range.end && slotEnd > range.start);
+                });
+
+                if (hasConflict) {
+                    return false;
                 }
+            }
+
+            if (apt.status === 'CANCELLED') {
+                return false;
             }
 
             return matchesSpecialization && (isAvailable || isOwnAppointment);
@@ -254,16 +263,13 @@ export const PatientCalendarView: React.FC<PatientCalendarViewProps> = ({
     return (
         <div className="flex flex-col h-screen max-h-screen bg-gray-50 p-6 relative">
             <div className="flex items-center justify-between mb-6">
-                {/* Empty left space to avoid overlap */}
                 <div className="w-64"></div>
 
-                {/* Specialization Selector - Center */}
                 <SpecializationSelector
                     selectedSpecialization={selectedSpecialization}
                     onSpecializationChange={setSelectedSpecialization}
                 />
 
-                {/* Navigation Controls - Right Side */}
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => setIsCartOpen(true)}

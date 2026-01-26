@@ -29,12 +29,10 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
     const handlePayment = () => {
         setIsProcessing(true);
 
-        // Simulate payment processing
         setTimeout(() => {
             setIsProcessing(false);
             setPaymentSuccess(true);
 
-            // Wait a moment to show success, then complete
             setTimeout(() => {
                 onPaymentComplete();
                 setPaymentSuccess(false);
@@ -73,7 +71,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                         </div>
 
                         <div className="p-6 space-y-6">
-                            {/* Order Summary */}
                             <div className="bg-gray-50 rounded-lg p-4">
                                 <h3 className="font-semibold text-gray-900 mb-3">Podsumowanie zamówienia</h3>
                                 <div className="space-y-2">
@@ -92,7 +89,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                                 </div>
                             </div>
 
-                            {/* Payment Form */}
                             <div className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">

@@ -138,7 +138,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                 }
             });
 
-            // Process conflicts
             await Promise.all([
                 ...toDelete.map(id => consultationService.deleteAppointment(id)),
                 ...toCancel.map(id => consultationService.updateAppointment(id, { status: 'CANCELLED' }))
@@ -146,12 +145,15 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
             setAbsences([...absences, newAbsence]);
 
-            // Refresh appointments from server
             const freshAppointments = await consultationService.getAllAppointments(doctorId);
             setAppointments(freshAppointments);
 
             if (toCancel.length > 0) {
-                alert(`Dodano nieobecność. ${toCancel.length} rezerwacji zostało odwołanych.`);
+                await consultationService.createNotification({
+                    recipientId: doctorId,
+                    message: `Dodano nieobecność. ${toCancel.length} rezerwacji zostało odwołanych i usuniętych z grafiku.`,
+                    type: 'SYSTEM'
+                });
             }
         } catch (error) {
             console.error("Failed to handle absence:", error);
@@ -159,8 +161,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
     };
 
     const handleSlotClick = (appointment: Appointment) => {
-        // Only handle BOOKED appointments for doctor detail view
-        // (PENDING_PAYMENT is obscured to AVAILABLE for doctor, so they won't trigger this for those)
         if (appointment.status === 'BOOKED') {
             setSelectedAppointment(appointment);
             setIsDetailModalOpen(true);
@@ -194,7 +194,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
 
             const freshAppointments = await consultationService.getAllAppointments(doctorId);
             setAppointments(freshAppointments);
-            console.log(`❌ Appointment ${appointmentId} cancelled by doctor.`);
+            console.log(`Appointment ${appointmentId} cancelled by doctor.`);
         } catch (error) {
             console.error("Failed to cancel appointment:", error);
         }
@@ -247,11 +247,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
             <div className="flex-1 overflow-hidden">
                 <WeekGrid
                     startDate={currentDate}
-                    appointments={appointments.map(apt =>
-                        apt.status === 'PENDING_PAYMENT'
-                            ? { ...apt, status: 'AVAILABLE' as const, patientId: undefined, patientName: undefined, notes: undefined }
-                            : apt
-                    )}
+                    appointments={appointments
+                        .filter(apt => apt.status !== 'CANCELLED')
+                        .map(apt =>
+                            apt.status === 'PENDING_PAYMENT'
+                                ? { ...apt, status: 'AVAILABLE' as const, patientId: undefined, patientName: undefined, notes: undefined }
+                                : apt
+                        )}
                     absences={absences}
                     onSlotClick={handleSlotClick}
                 />
@@ -273,7 +275,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
                     </div>
                 </div>
 
-                {/* Absences List */}
                 {absences.length > 0 && (
                     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 max-w-md">
                         <h3 className="text-sm font-semibold text-gray-700 mb-2">Twoje nieobecności:</h3>

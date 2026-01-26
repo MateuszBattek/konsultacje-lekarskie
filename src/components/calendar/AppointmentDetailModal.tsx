@@ -86,7 +86,6 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                         </div>
                     </div>
 
-                    {/* Status Badge */}
                     <div className="pt-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${appointment.status === 'BOOKED'
                             ? 'bg-blue-100 text-blue-700'
@@ -96,7 +95,6 @@ export const AppointmentDetailModal: React.FC<AppointmentDetailModalProps> = ({
                         </span>
                     </div>
 
-                    {/* Cancellation Section */}
                     {canCancel && (
                         <div className="pt-6 border-t">
                             {isConfirming ? (

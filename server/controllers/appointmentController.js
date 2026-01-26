@@ -31,7 +31,6 @@ export const updateAppointment = async (req, res) => {
     try {
         const appointment = await Appointment.findById(id);
 
-        // Check if appointment is being cancelled (either set to CANCELLED or reset to AVAILABLE from BOOKED)
         const isCancellation =
             (appointment && appointment.status === 'BOOKED' && status === 'CANCELLED') ||
             (appointment && appointment.status === 'BOOKED' && status === 'AVAILABLE' && (patientId === null || patientId === undefined));
@@ -61,7 +60,6 @@ export const deleteAppointment = async (req, res) => {
     try {
         const appointment = await Appointment.findById(id);
 
-        // Only send notification for main slots (not sub-slots)
         if (appointment.status === 'BOOKED' && appointment.patientId && !appointment.isSubSlot) {
             const date = new Date(appointment.startTime).toLocaleDateString('pl-PL');
             const time = new Date(appointment.startTime).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });

@@ -6,11 +6,26 @@ export const getNotifications = async (req, res) => {
         if (!userId) return res.status(400).json({ message: "User ID required" });
 
         const notifications = await Notification.find({ recipientId: userId })
-            .sort({ createdAt: -1 }); // Newest first
+            .sort({ createdAt: -1 });
 
         res.status(200).json(notifications);
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+};
+
+export const createNotification = async (req, res) => {
+    const notification = req.body;
+    try {
+        const newNotification = new Notification({
+            ...notification,
+            isRead: false,
+            createdAt: new Date()
+        });
+        await newNotification.save();
+        res.status(201).json(newNotification);
+    } catch (error) {
+        res.status(409).json({ message: error.message });
     }
 };
 

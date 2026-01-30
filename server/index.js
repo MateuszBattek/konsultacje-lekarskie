@@ -8,6 +8,7 @@ import appointmentRoutes from './routes/appointmentRoutes.js';
 import absenceRoutes from './routes/absenceRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import { runAppointmentMaintenance } from './controllers/appointmentController.js';
 
 dotenv.config();
 
@@ -31,5 +32,9 @@ if (!CONNECTION_URL) {
 }
 
 mongoose.connect(CONNECTION_URL)
-    .then(() => app.listen(PORT, () => console.log(`Server Running on Port: http://localhost:${PORT}`)))
+    .then(() => app.listen(PORT, () => {
+        console.log(`Server Running on Port: http://localhost:${PORT}`);
+        runAppointmentMaintenance();
+        setInterval(runAppointmentMaintenance, 300000);
+    }))
     .catch((error) => console.log(`${error} did not connect`));

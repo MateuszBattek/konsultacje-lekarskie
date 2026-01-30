@@ -10,11 +10,11 @@ export const signin = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
 
-        if (!existingUser) return res.status(404).json({ message: "User doesn't exist." });
+        if (!existingUser) return res.status(404).json({ message: "Taki użytkownik nie istnieje." });
 
         const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
 
-        if (!isPasswordCorrect) return res.status(400).json({ message: "Invalid credentials." });
+        if (!isPasswordCorrect) return res.status(400).json({ message: "Niepoprawne hasło." });
 
         const accessToken = jwt.sign(
             { email: existingUser.email, id: existingUser._id, role: existingUser.role },
@@ -37,7 +37,7 @@ export const signin = async (req, res) => {
             refreshToken: refreshToken
         });
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong." });
+        res.status(500).json({ message: "Coś poszło nie tak." });
     }
 };
 
@@ -47,9 +47,9 @@ export const signup = async (req, res) => {
     try {
         const existingUser = await User.findOne({ email });
 
-        if (existingUser) return res.status(400).json({ message: "User already exists." });
+        if (existingUser) return res.status(400).json({ message: "Taki użytkownik już istnieje." });
 
-        if (password !== confirmPassword) return res.status(400).json({ message: "Passwords don't match." });
+        if (password !== confirmPassword) return res.status(400).json({ message: "Hasła nie są identyczne." });
 
         const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -81,7 +81,7 @@ export const signup = async (req, res) => {
             refreshToken: refreshToken
         });
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong." });
+        res.status(500).json({ message: "Coś poszło nie tak." });
     }
 };
 
@@ -90,7 +90,7 @@ export const getDoctors = async (req, res) => {
         const doctors = await User.find({ role: 'DOCTOR' }).select('-password');
         res.status(200).json(doctors);
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong." });
+        res.status(500).json({ message: "Coś poszło nie tak." });
     }
 };
 
@@ -127,8 +127,8 @@ export const logout = async (req, res) => {
 
     try {
         await User.findByIdAndUpdate(userId, { refreshToken: null });
-        res.status(200).json({ message: "Logged out successfully." });
+        res.status(200).json({ message: "Wylogowano pomyślnie." });
     } catch (error) {
-        res.status(500).json({ message: "Something went wrong." });
+        res.status(500).json({ message: "Coś poszło nie tak." });
     }
 };

@@ -1,4 +1,5 @@
 import { Appointment } from '../models/Appointment.js';
+import { Notification } from '../models/Notification.js';
 
 export const getAppointments = async (req, res) => {
     try {
@@ -22,7 +23,6 @@ export const createAppointment = async (req, res) => {
     }
 };
 
-import { Notification } from '../models/Notification.js';
 
 export const updateAppointment = async (req, res) => {
     const { id } = req.params;
@@ -127,5 +127,40 @@ export const bulkUpdateAppointments = async (req, res) => {
         res.status(200).json({ message: 'Bulk update successful' });
     } catch (error) {
         res.status(409).json({ message: error.message });
+    }
+};
+
+export const runAppointmentMaintenance = async () => {
+    try {
+        const now = new Date();
+
+        const completedResult = await Appointment.updateMany(
+            {
+                status: 'BOOKED',
+                $expr: {
+                    $lt: [
+                        { $add: ["$startTime", { $multiply: ["$durationMinutes", 60000] }] },
+                        now
+                    ]
+                }
+            },
+            { $set: { status: 'COMPLETED' } }
+        );
+
+        if (completedResult.modifiedCount > 0) {
+            console.log(`Auto-completed ${completedResult.modifiedCount} appointments.`);
+        }
+
+        const deletedResult = await Appointment.deleteMany({
+            status: 'AVAILABLE',
+            startTime: { $lt: now }
+        });
+
+        if (deletedResult.deletedCount > 0) {
+            console.log(`Auto-deleted ${deletedResult.deletedCount} expired slots.`);
+        }
+
+    } catch (error) {
+        console.error('Error running appointment maintenance:', error);
     }
 };
